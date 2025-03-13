@@ -3,7 +3,7 @@ import boto3
 
 def lambda_handler(event, context):
     s3 = boto3.client('s3')
-    bucket_name = 'n8n-tesast111-98698798'
+    bucket_name = 'n8n-tesast-98698798'
     
     try:
         # Delete S3 bucket
