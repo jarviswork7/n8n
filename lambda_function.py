@@ -1,1 +1,10 @@
-import boto3\n\ndef lambda_handler(event, context):\n    sqs_client = boto3.client('sqs')\n    response = sqs_client.list_queues()\n    queues = response.get('QueueUrls', [])\n    return {\n        'statusCode': 200,\n        'body': queues\n    }\n
+import boto3
+
+def lambda_handler(event, context):
+    s3_client = boto3.client('s3')
+    response = s3_client.list_buckets()
+    buckets = [bucket['Name'] for bucket in response['Buckets']]
+    return {
+        'statusCode': 200,
+        'body': buckets
+    }
