@@ -1,6 +1,5 @@
 import boto3
 
-
 def lambda_handler(event, context):
     # Create EC2 instance
     ec2 = boto3.resource('ec2', region_name='us-east-1')
