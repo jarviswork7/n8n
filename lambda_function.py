@@ -1,14 +1,18 @@
+import json
 import boto3
 
-# Function to invoke the Lambda function
-
-def lambda_invoke(event, context):
-    client = boto3.client('lambda')
-    response = client.invoke(
-        FunctionName='YourLambdaFunctionName',  # Replace with your Lambda function name
-        InvocationType='RequestResponse'
+def lambda_handler(event, context):
+    ec2 = boto3.client('ec2')
+    # Create an EC2 instance
+    response = ec2.run_instances(
+        ImageId='ami-08b5b3a93ed654d19',
+        InstanceType='t3.micro',
+        MinCount=1,
+        MaxCount=1,
+        KeyName='your-key-pair',  # Update with your key pair
+        SecurityGroupIds=['your-security-group-id']  # Update with your security group id
     )
-    
-    # Read the response
-    response_payload = response['Payload'].read().decode('utf-8')
-    return response_payload
+    return {
+        'statusCode': 200,
+        'body': json.dumps(response['Instances'][0])
+    }
