@@ -1,18 +1,1 @@
-import json
-import boto3
-
-def lambda_handler(event, context):
-    ec2 = boto3.client('ec2')
-    # Create an EC2 instance
-    response = ec2.run_instances(
-        ImageId='ami-08b5b3a93ed654d19',
-        InstanceType='t3.micro',
-        MinCount=1,
-        MaxCount=1,
-        KeyName='your-key-pair',  # Update with your key pair
-        SecurityGroupIds=['your-security-group-id']  # Update with your security group id
-    )
-    return {
-        'statusCode': 200,
-        'body': json.dumps(response['Instances'][0])
-    }
+import json\nimport boto3\n\ndef lambda_handler(event, context):\n    ec2 = boto3.resource('ec2')\n    instance = ec2.create_instances(\n        ImageId='ami-08b5b3a93ed654d19',\n        MinCount=1,\n        MaxCount=1,\n        InstanceType='t3.micro'\n    )\n    return {\n        'statusCode': 200,\n        'body': json.dumps('EC2 Instance Created: ' + instance[0].id)\n    }
