@@ -3,11 +3,12 @@ import boto3
 
 def lambda_handler(event, context):
     s3 = boto3.client('s3')
-    bucket_name = 'n8n-tesast-98698798'
+    bucket_name = 'n8n-tesast111-98698798'
     
     try:
         # Create S3 bucket
-        s3.create_bucket(Bucket=bucket_name)
+        s3.create_bucket(Bucket=bucket_name,
+                         CreateBucketConfiguration={'LocationConstraint': 'us-east-1'})
         return {
             'statusCode': 200,
             'body': json.dumps({'message': 'Bucket created successfully'})
