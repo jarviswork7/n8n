@@ -1,1 +1,15 @@
-import boto3\n\ndef lambda_handler(event, context):\n    # Create EC2 instance\n    ec2 = boto3.resource('ec2', region_name='us-east-1')\n    instance = ec2.create_instances(\n        ImageId='ami-08b5b3a93ed654d19',\n        InstanceType='t3.micro',\n        MinCount=1,\n        MaxCount=1\n    )\n    \n    return {\n        'instance_id': instance[0].id\n    }
+import boto3
+
+def lambda_handler(event, context):
+    # Create EC2 instance
+    ec2 = boto3.resource('ec2', region_name='us-east-1')
+    instance = ec2.create_instances(
+        ImageId='ami-08b5b3a93ed654d19',
+        InstanceType='t3.micro',
+        MinCount=1,
+        MaxCount=1
+    )
+    
+    return {
+        'instance_id': instance[0].id
+    }
