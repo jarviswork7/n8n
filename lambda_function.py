@@ -1,1 +1,18 @@
-import json\nimport boto3\n\ndef create_ec2_instance(event, context):\n    ec2 = boto3.resource('ec2')\n    instance = ec2.create_instances(\n        ImageId=event['ami_id'],\n        MinCount=1,\n        MaxCount=1,\n        InstanceType=event['instance_type']\n    )\n    return {\n        'statusCode': 200,\n        'body': json.dumps({\n            'message': 'Instance created successfully',\n            'instance_id': instance[0].id\n        })\n    }\n\ndef get_instance_details(event, context):\n    ec2 = boto3.client('ec2')\n    instance_id = event['instance_id']\n    response = ec2.describe_instances(InstanceIds=[instance_id])\n    instance_info = response['Reservations'][0]['Instances'][0]\n    return {\n        'statusCode': 200,\n        'body': json.dumps(instance_info)\n    }
+import json
+import boto3
+
+def lambda_handler(event, context):
+    ec2 = boto3.resource('ec2')
+    instance = ec2.create_instances(
+        ImageId=event['ami_id'],
+        MinCount=1,
+        MaxCount=1,
+        InstanceType=event['instance_type']
+    )
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'message': 'Instance created successfully',
+            'instance_id': instance[0].id
+        })
+    }
