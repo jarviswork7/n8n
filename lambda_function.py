@@ -7,8 +7,7 @@ def lambda_handler(event, context):
     
     try:
         # Create S3 bucket
-        s3.create_bucket(Bucket=bucket_name,
-                         CreateBucketConfiguration={'LocationConstraint': 'us-east-1'})
+        s3.create_bucket(Bucket=bucket_name)
         return {
             'statusCode': 200,
             'body': json.dumps({'message': 'Bucket created successfully'})
