@@ -2,15 +2,15 @@ import json
 import boto3
 
 def lambda_handler(event, context):
-    s3 = boto3.client('s3')
-    bucket_name = 'daniel-on-n8n-testing'
+    sqs = boto3.client('sqs')
+    queue_name = 'daniel-test-queue'
     
     try:
-        # Delete S3 bucket
-        s3.delete_bucket(Bucket=bucket_name)
+        # Create SQS queue
+        response = sqs.create_queue(QueueName=queue_name)
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Bucket deleted successfully'})
+            'body': json.dumps({'message': 'Queue created successfully', 'queue_url': response['QueueUrl']})
         }
     except Exception as e:
         return {
