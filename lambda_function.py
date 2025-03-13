@@ -1,14 +1,14 @@
 import boto3
 
-def lambda_handler(event, context):
-    ec2 = boto3.resource('ec2')
-    instance = ec2.create_instances(
-        ImageId='ami-08b5b3a93ed654d19',  # Specified AMI ID
-        InstanceType='t3.micro',
-        MinCount=1,
-        MaxCount=1
+# Function to invoke the Lambda function
+
+def lambda_invoke(event, context):
+    client = boto3.client('lambda')
+    response = client.invoke(
+        FunctionName='YourLambdaFunctionName',  # Replace with your Lambda function name
+        InvocationType='RequestResponse'
     )
-    return {
-        'statusCode': 200,
-        'body': f'Created instance ID: {instance[0].id}'
-    }
+    
+    # Read the response
+    response_payload = response['Payload'].read().decode('utf-8')
+    return response_payload
