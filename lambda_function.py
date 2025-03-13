@@ -1,1 +1,26 @@
-import json\nimport boto3\n\ndef lambda_handler(event, context):\n    s3 = boto3.client('s3')\n    bucket_name = 'n8n-test-98698798'\n    try:\n        # Delete all objects in the bucket first\n        response = s3.list_objects_v2(Bucket=bucket_name)\n        if 'Contents' in response:\n            for obj in response['Contents']:\n                s3.delete_object(Bucket=bucket_name, Key=obj['Key'])\n\n        # Now delete the bucket\n        s3.delete_bucket(Bucket=bucket_name)\n        return {\n            'statusCode': 200,\n            'body': json.dumps({'message': 'Bucket deleted successfully'})\n        }\n    except Exception as e:\n        return {\n            'statusCode': 500,\n            'body': json.dumps({'error': str(e)})\n        }
+import json
+import boto3
+
+
+def lambda_handler(event, context):
+    s3 = boto3.client('s3')
+    bucket_name = 'n8n-test-98698798'
+    
+    try:
+        # Delete all objects in the bucket first
+        response = s3.list_objects_v2(Bucket=bucket_name)
+        if 'Contents' in response:
+            for obj in response['Contents']:
+                s3.delete_object(Bucket=bucket_name, Key=obj['Key'])
+
+        # Now delete the bucket
+        s3.delete_bucket(Bucket=bucket_name)
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'message': 'Bucket deleted successfully'})
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
