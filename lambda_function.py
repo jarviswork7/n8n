@@ -1,36 +1,39 @@
 import boto3
 
-def get_latest_ami_id():
-    ec2_client = boto3.client('ec2', region_name='us-east-1')
-    response = ec2_client.describe_images(
-        Filters=[
-            {'Name': 'name', 'Values': ['al2023-ami-*']},
-            {'Name': 'state', 'Values': ['available']},
-            {'Name': 'owner-alias', 'Values': ['amazon']}
-        ],
-        Owners=['amazon'],
-        SortBy='CreationDate',
-        MaxResults=1,
-        SortAscending=False
-    )
-    images = response['Images']
-    if images:
-        return images[0]['ImageId']
-    else:
-        raise Exception("No Amazon Linux 2023 AMI found.")
+def create_ec2_instance():
+    # Create a session using default credentials
+    session = boto3.Session(region_name='us-east-1')
 
-def launch_ec2_instance():
-    ami_id = get_latest_ami_id()
-    ec2_resource = boto3.resource('ec2', region_name='us-east-1')
-    instance = ec2_resource.create_instances(
-        ImageId=ami_id,
-        InstanceType='t2.micro',
+    # Create an EC2 client
+    ec2_client = session.client('ec2')
+
+    # Retrieve the latest Amazon Linux 2023 AMI ID
+    ami_response = ec2_client.describe_images(
+        Filters=[
+            {'Name': 'name', 'Values': ['*amzn2-ami-kernel-5.10-hvm-*']},
+            {'Name': 'owner-alias', 'Values': ['amazon']},
+            {'Name': 'state', 'Values': ['available']}
+        ],
+        Owners=['137112412989'],  # Amazon's official account ID
+        MaxResults=1,
+        SortBy='CreationDate',
+        SortOrder='Descending'
+    )
+    
+    latest_ami_id = ami_response['Images'][0]['ImageId']
+
+    # Launch an EC2 instance
+    instance_response = ec2_client.run_instances(
+        ImageId=latest_ami_id,
+        InstanceType='t3.micro',
         KeyName='your-key-pair-name',  # Replace with your key pair name
         MinCount=1,
         MaxCount=1,
-        SecurityGroupIds=['your-security-group-id'],  # Replace with your security group id
+        SecurityGroupIds=['your-security-group-id'],  # Replace with your security group ID
     )
-    print("EC2 Instance created with ID:", instance[0].id)
 
-if __name__ == "__main__":
-    launch_ec2_instance()
+    instance_id = instance_response['Instances'][0]['InstanceId']
+    print(f'EC2 Instance {instance_id} created with AMI {latest_ami_id}')
+
+# Call the function to create the instance
+create_ec2_instance()
