@@ -1,12 +1,18 @@
 import boto3
 
-def lambda_handler(event, context):
-    # Create SQS client
-    sqs = boto3.client('sqs', region_name='us-east-1')
-    
-    # Create SQS queue
-    response = sqs.create_queue(QueueName='test-sqs')
-    
-    return {
-        'QueueUrl': response['QueueUrl']
-    }
+
+def create_sqs_queue():
+    # Initialize a session using Amazon SQS
+    session = boto3.Session(region_name='us-east-1')
+    sqs = session.client('sqs')
+
+    # Create a new SQS queue
+    response = sqs.create_queue(
+        QueueName='test-sqs'
+    )
+
+    print(f'Queue created with URL: {response['QueueUrl']}')
+
+
+if __name__ == '__main__':
+    create_sqs_queue()
