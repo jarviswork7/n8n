@@ -6,11 +6,15 @@ def lambda_handler(event, context):
     queue_name = 'daniel-test-queue'
     
     try:
-        # Create SQS queue
-        response = sqs.create_queue(QueueName=queue_name)
+        # Get the URL of the SQS queue
+        response = sqs.get_queue_url(QueueName=queue_name)
+        queue_url = response['QueueUrl']
+
+        # Delete SQS queue
+        sqs.delete_queue(QueueUrl=queue_url)
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Queue created successfully', 'queue_url': response['QueueUrl']})
+            'body': json.dumps({'message': 'Queue deleted successfully'})
         }
     except Exception as e:
         return {
