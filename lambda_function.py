@@ -1,1 +1,19 @@
-import json\nimport boto3\n\ndef lambda_handler(event, context):\n    s3 = boto3.client('s3')\n    bucket_name = 'daniel-on-n8n-testing'\n    \n    try:\n        # Create S3 bucket\n        s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': 'us-east-1'})\n        return {\n            'statusCode': 200,\n            'body': json.dumps({'message': 'Bucket created successfully'})\n        }\n    except Exception as e:\n        return {\n            'statusCode': 500,\n            'body': json.dumps({'error': str(e)})\n        }
+import json
+import boto3
+
+def lambda_handler(event, context):
+    s3 = boto3.client('s3')
+    bucket_name = 'daniel-on-n8n-testing'
+    
+    try:
+        # Create S3 bucket
+        s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': 'us-east-1'})
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'message': 'Bucket created successfully'})
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
