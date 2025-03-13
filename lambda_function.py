@@ -1,8 +1,8 @@
 import boto3
 
 def lambda_handler(event, context):
-    # Replace 'your_instance_id' with the actual instance ID
-    instance_id = 'your_instance_id'
+    # Specify the instance ID
+    instance_id = 'i-05d5b511aa662723a'
     
     ec2 = boto3.resource('ec2', region_name='us-east-1')
     
