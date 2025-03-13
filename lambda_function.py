@@ -13,8 +13,8 @@ def lambda_handler(event, context):
         InstanceType='t3.micro',
         MinCount=1,
         MaxCount=1,
-        KeyName='default-key-pair',  # Default key pair name, replace as needed
-        SecurityGroupIds=['default-security-group'],  # Default security group, replace as needed
+        KeyName='default-key-pair',  # Default key pair name
+        SecurityGroupIds=['default-security-group'],  # Default security group
     )
 
     return response
