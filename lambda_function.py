@@ -1,10 +1,14 @@
 import boto3
 
 def lambda_handler(event, context):
-    s3_client = boto3.client('s3')
-    response = s3_client.list_buckets()
-    buckets = [bucket['Name'] for bucket in response['Buckets']]
+    ec2 = boto3.resource('ec2')
+    instance = ec2.create_instances(
+        ImageId='ami-0c55b159cbfafe1f0',  # Replace with a valid AMI ID for your region
+        InstanceType='t3.micro',
+        MinCount=1,
+        MaxCount=1
+    )
     return {
         'statusCode': 200,
-        'body': buckets
+        'body': f'Created instance ID: {instance[0].id}'
     }
