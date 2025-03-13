@@ -1,23 +1,34 @@
-import json
 import boto3
 
-def lambda_handler(event, context):
-    sqs = boto3.client('sqs')
-    queue_name = 'daniel-test-queue'
-    
-    try:
-        # Get the URL of the SQS queue
-        response = sqs.get_queue_url(QueueName=queue_name)
-        queue_url = response['QueueUrl']
+# Create an EC2 client
+client = boto3.client('ec2', region_name='us-east-1')
 
-        # Delete SQS queue
-        sqs.delete_queue(QueueUrl=queue_url)
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'message': 'Queue deleted successfully'})
+# Get the latest Amazon Linux 2023 AMI ID
+response = client.describe_images(
+    Filters=[
+        {
+            'Name': 'name', 
+            'Values': ['amzn2-ami-hvm-*-x86_64-gp2']
+        },
+        {
+            'Name': 'is-public',
+            'Values': ['true']
         }
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
-        }
+    ],
+    Owners=['amazon'],
+    MaxResults=1
+)
+
+latest_ami_id = response['Images'][0]['ImageId']
+
+# Launch an EC2 instance using the latest AMI ID
+instance_response = client.run_instances(
+    ImageId=latest_ami_id,
+    MinCount=1,
+    MaxCount=1,
+    InstanceType='t2.micro',
+    KeyName='your-key-pair-name',  # Replace with your key pair name
+    SecurityGroupIds=['your-security-group-id'],  # Replace with your security group id
+)
+
+print(f"EC2 Instance created with ID: {instance_response['Instances'][0]['InstanceId']}")
