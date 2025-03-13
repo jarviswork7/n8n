@@ -1,23 +1,17 @@
 import json
 import boto3
 
-
 def lambda_handler(event, context):
     s3 = boto3.client('s3')
-    bucket_name = 'n8n-test-98698798'
+    bucket_name = 'n8n-tesast-98698798'
     
     try:
-        # Delete all objects in the bucket first
-        response = s3.list_objects_v2(Bucket=bucket_name)
-        if 'Contents' in response:
-            for obj in response['Contents']:
-                s3.delete_object(Bucket=bucket_name, Key=obj['Key'])
-
-        # Now delete the bucket
-        s3.delete_bucket(Bucket=bucket_name)
+        # Create S3 bucket
+        s3.create_bucket(Bucket=bucket_name,
+                         CreateBucketConfiguration={'LocationConstraint': 'us-east-1'})
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Bucket deleted successfully'})
+            'body': json.dumps({'message': 'Bucket created successfully'})
         }
     except Exception as e:
         return {
