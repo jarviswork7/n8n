@@ -6,12 +6,11 @@ def lambda_handler(event, context):
     bucket_name = 'n8n-tesast111-98698798'
     
     try:
-        # Create S3 bucket
-        s3.create_bucket(Bucket=bucket_name,
-                         CreateBucketConfiguration={'LocationConstraint': 'us-east-1'})
+        # Delete S3 bucket
+        s3.delete_bucket(Bucket=bucket_name)
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Bucket created successfully'})
+            'body': json.dumps({'message': 'Bucket deleted successfully'})
         }
     except Exception as e:
         return {
