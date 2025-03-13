@@ -1,10 +1,13 @@
 import boto3
 
 def lambda_handler(event, context):
-    s3_client = boto3.client('s3')
-    response = s3_client.list_buckets()
-    bucket_names = [bucket['Name'] for bucket in response['Buckets']]
+    ec2_client = boto3.client('ec2')
+    response = ec2_client.describe_instances()
+    instances = []
+    for reservation in response['Reservations']:
+        for instance in reservation['Instances']:
+            instances.append(instance['InstanceId'])
     return {
         'statusCode': 200,
-        'body': bucket_names
+        'body': instances
     }
