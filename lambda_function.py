@@ -1,27 +1,28 @@
 import boto3
 
 def lambda_handler(event, context):
-    ec2_client = boto3.client('ec2', region_name='us-east-1')
-    instance_ids = ['i-0d7297d85a0b55558', 'i-00120a83bfd0cd783']
+    ec2 = boto3.resource('ec2', region_name='us-east-1')
     
-    # Disable termination protection
-    ec2_client.modify_instance_attribute(
-        InstanceId='i-0d7297d85a0b55558',
-        DisableApiTermination={
-            'Value': False
-        }
+    # Create a new EC2 instance
+    instances = ec2.create_instances(
+        ImageId='ami-08b5b3a93ed654d19',
+        MinCount=1,
+        MaxCount=1,
+        InstanceType='t3.micro',
+        TagSpecifications=[
+            {
+                'ResourceType': 'instance',
+                'Tags': [
+                    {'Key': 'createdBy', 'Value': 'Daniel'},
+                    {'Key': 'Name', 'Value': 'n8n'}
+                ]
+            }
+        ]
     )
-    ec2_client.modify_instance_attribute(
-        InstanceId='i-00120a83bfd0cd783',
-        DisableApiTermination={
-            'Value': False
-        }
-    )
-
-    # Terminate instances
-    ec2_client.terminate_instances(InstanceIds=instance_ids)
-
-    return {
-        'statusCode': 200,
-        'body': f"Termination initiated for instances: {','.join(instance_ids)}"
-    }
+    
+    # Enable termination protection
+    instance_id = instances[0].id
+    ec2_client = boto3.client('ec2', region_name='us-east-1')
+    ec2_client.modify_instance_attribute(InstanceId=instance_id, DisableApiTermination={'Value': True})
+    
+    return {'InstanceId': instance_id}
