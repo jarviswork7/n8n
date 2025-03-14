@@ -1,7 +1,16 @@
 import boto3
 
 def lambda_handler(event, context):
-    s3 = boto3.client('s3', region_name='us-east-1')
-    buckets = s3.list_buckets()
-    bucket_names = [bucket['Name'] for bucket in buckets['Buckets']]
-    return {'Buckets': bucket_names}
+    # Create a session using boto3
+    session = boto3.Session(region_name='us-east-1')
+    
+    # Create an S3 client
+    s3_client = session.client('s3')
+    
+    # List all buckets
+    response = s3_client.list_buckets()
+    
+    # Get the list of bucket names
+    buckets = [bucket['Name'] for bucket in response['Buckets']]
+    
+    return {'buckets': buckets}
