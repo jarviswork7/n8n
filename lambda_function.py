@@ -1,17 +1,14 @@
 import boto3
 
 def lambda_handler(event, context):
-    s3 = boto3.client('s3')
-    bucket_name = 'lambda-code-n8n'
+    ec2 = boto3.client('ec2', region_name='us-east-1')
     
-    try:
-        # Delete all objects in the bucket
-        objects = s3.list_objects_v2(Bucket=bucket_name).get('Contents', [])
-        for obj in objects:
-            s3.delete_object(Bucket=bucket_name, Key=obj['Key'])
-        
-        # Delete the bucket
-        s3.delete_bucket(Bucket=bucket_name)
-        return {'status': 'Bucket deleted successfully'}
-    except Exception as e:
-        return {'error': str(e)}
+    instance = ec2.run_instances(
+        ImageId='ami-08b5b3a93ed654d19',
+        InstanceType='t3.micro',
+        MinCount=1,
+        MaxCount=1
+    )
+    
+    instance_id = instance['Instances'][0]['InstanceId']
+    return {'InstanceId': instance_id}
