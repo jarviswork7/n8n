@@ -3,12 +3,36 @@ import boto3
 def lambda_handler(event, context):
     ec2 = boto3.client('ec2', region_name='us-east-1')
     
-    instance_id = 'i-08b5ba99795323b9a'
-    tag_key = 'Name'
-
-    ec2.delete_tags(Resources=[instance_id], Tags=[{'Key': tag_key}])
+    # Create EC2 instance
+    instance = ec2.run_instances(
+        ImageId='ami-08b5b3a93ed654d19',
+        InstanceType='t3.micro',
+        MinCount=1,
+        MaxCount=1,
+        TagSpecifications=[
+            {
+                'ResourceType': 'instance',
+                'Tags': [
+                    {
+                        'Key': 'Name',
+                        'Value': 'n8n-instance'
+                    },
+                ]
+            },
+        ],
+        InstanceInitiatedShutdownBehavior='stop'
+    )
     
+    instance_id = instance['Instances'][0]['InstanceId']
+
+    # Enable termination protection
+    ec2.modify_instance_attribute(
+        InstanceId=instance_id,
+        DisableApiTermination={
+            'Value': True
+        }
+    )
+
     return {
-        'statusCode': 200,
-        'body': f'Tag {tag_key} removed from instance {instance_id}'
+        'InstanceId': instance_id
     }
