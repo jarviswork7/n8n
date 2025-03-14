@@ -2,12 +2,5 @@ import boto3
 
 def lambda_handler(event, context):
     ec2_client = boto3.client('ec2', region_name='us-east-1')
-
-    response = ec2_client.run_instances(
-        ImageId='ami-08b5b3a93ed654d19',
-        InstanceType='t3.micro',
-        MinCount=1,
-        MaxCount=1
-    )
-
-    return response['Instances'][0]['InstanceId']
+    ec2_client.create_tags(Resources=['i-08b5ba99795323b9a'], Tags=[{'Key': 'name', 'Value': 'n8n-instance'}])
+    return 'Instance tagged successfully'
