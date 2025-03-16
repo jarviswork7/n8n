@@ -2,46 +2,45 @@ import boto3
 import zipfile
 import os
 
-def lambda_handler(event, context):
-    """
-    Basic AWS Lambda handler function returning a success message.
-    """
-    return {
-        'statusCode': 200,
-        'body': 'Hello from n8n-testing-flow! The function has been executed successfully.'
-    }
-
 def create_lambda_function():
     """
     Creates and deploys a Lambda function named 'n8n-testing-flow'.
     """
-    # Creating the zip file with the lambda function code
+    # Create a zip file for the Java code
     zip_file = 'function.zip'
     with zipfile.ZipFile(zip_file, 'w') as z:
-        z.writestr('lambda_function.py', """
-def lambda_handler(event, context):
-    \"\"\"\n    Basic AWS Lambda handler function returning a success message.\n    \"\"\"\n    return {\n        'statusCode': 200,\n        'body': 'Hello from n8n-testing-flow! The function has been executed successfully.'\n    }\n"""
-)
+        z.writestr('Handler.java', """
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
+public class Handler implements RequestHandler<Object, String> {
+    @Override
+    public String handleRequest(Object input, Context context) {
+        return "Hello from n8n-testing-flow! The function has been executed successfully.";
+    }
+}
+"""
+    )
 
     # Initialize a boto3 client for Lambda
     client = boto3.client('lambda', region_name='us-east-1')
 
-    # Read the zipped code containing the lambda_handler
+    # Read the zipped code containing the Handler class
     with open(zip_file, 'rb') as f:
         zipped_code = f.read()
 
     # Create the Lambda function with best practices in mind
     response = client.create_function(
         FunctionName='n8n-testing-flow',
-        Runtime='python3.8',  # Using Python runtime
+        Runtime='java21',  # Using Java 21 runtime
         Role='your-execution-role-arn',  # Replace with the actual IAM role ARN
-        Handler='lambda_function.lambda_handler', 
+        Handler='Handler', 
         Code=dict(ZipFile=zipped_code),
         Timeout=30,  # Timeout set to 30 seconds
         MemorySize=100,  # Memory size set to 100 MB
         Tags={
             'createdBy': 'Daniel',
-            'Name': 'n8n-testing-flow'  # Tagging for identification
+            'Name': 'n8n'  # Tagging for identification
         },
         Architectures=['arm64'],  # Following best practice for architecture
     )
