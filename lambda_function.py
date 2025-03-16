@@ -18,7 +18,7 @@ def lambda_handler(event, context):
             },
             Description='Example Lambda function created following best practices',
             Timeout=30,
-            MemorySize=100,
+            MemorySize=128,
             Tags={
                 'createdBy': 'Daniel',
                 'Name': 'n8n'
