@@ -31,10 +31,10 @@ def lambda_handler(event, context):
                 }
             ],
             IamInstanceProfile={
-                'Name': 'your-instance-profile-name'  # Replace with actual profile
+                'Name': 'your-instance-profile-name'  # Replace with the actual IAM profile
             },
             NetworkInterfaces=[{
-                'SubnetId': 'your-subnet-id',  # Replace with actual subnet ID
+                'SubnetId': 'your-subnet-id',  # Replace with the actual subnet ID
                 'DeviceIndex': 0,
                 'AssociatePublicIpAddress': False  # Disable Public IP
             }]
