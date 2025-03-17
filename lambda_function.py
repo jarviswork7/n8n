@@ -3,36 +3,16 @@ import boto3
 def lambda_handler(event, context):
     s3 = boto3.client('s3')
     bucket_name = 'n8n-your-bucket-name'
-    
-    # Create the bucket
-    s3.create_bucket(Bucket=bucket_name)
-    
-    # Enable versioning
-    s3.put_bucket_versioning(
-        Bucket=bucket_name,
-        VersioningConfiguration={
-            'Status': 'Enabled'
-        }
-    )
-    
-    # Tag the bucket
-    s3.put_bucket_tagging(
-        Bucket=bucket_name,
-        Tagging={
-            'TagSet': [
-                {
-                    'Key': 'createdBy',
-                    'Value': 'Daniel'
-                },
-                {
-                    'Key': 'Name',
-                    'Value': 'n8n'
-                }
-            ]
-        }
-    )
 
-    return {
-        'statusCode': 200,
-        'body': f'Bucket {bucket_name} created successfully with versioning enabled and appropriate tags.'
-    }
+    try:
+        # Delete the bucket
+        s3.delete_bucket(Bucket=bucket_name)
+        return {
+            'statusCode': 200,
+            'body': f'Bucket {bucket_name} deleted successfully'
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': f'Error deleting bucket: {str(e)}'
+        }
