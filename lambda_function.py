@@ -2,12 +2,15 @@ import boto3
 import json
 
 def lambda_handler(event, context):
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client('s3', region_name='us-east-1')
     bucket_name = 'hello-world'
 
     try:
         # Create S3 bucket
-        s3_client.create_bucket(Bucket=bucket_name)
+        s3_client.create_bucket(
+            Bucket=bucket_name,
+            CreateBucketConfiguration={'LocationConstraint': 'us-east-1'}
+        )
         
         # Enable versioning
         s3_client.put_bucket_versioning(
