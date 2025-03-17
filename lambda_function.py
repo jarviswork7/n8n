@@ -1,7 +1,7 @@
 import boto3
 
 def lambda_handler(event, context):
-    s3 = boto3.client('s3')
+    s3 = boto3.client('s3', region_name='us-east-1')
     bucket_name = "hello-world"
     
     try:
