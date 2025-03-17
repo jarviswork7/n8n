@@ -2,22 +2,24 @@ import boto3
 
 def lambda_handler(event, context):
     client = boto3.client('lambda')
-
-    function_name = 'n8n-myLambdaFunction'
-
     response = client.create_function(
-        FunctionName=function_name,
+        FunctionName='MyLambdaFunction',
         Runtime='python3.9',
-        Role='arn:aws:iam::123456789012:role/service-role',  # Modify with appropriate IAM role
+        Role='<ROLE_ARN>',  # Assuming role is provided correctly
         Handler='lambda_function.lambda_handler',
+        Code={
+            'ZipFile': b"""
+            def lambda_handler(event, context):
+                return "Hello from Lambda!"
+            """
+        },
+        Description='A simple Lambda function',
         Timeout=30,
         MemorySize=128,
-        Architectures=['arm64'],
-        PackageType='Zip',
         Tags={
-            "createdBy": "Daniel",
-            "Name": "n8n"
-        }
+            'createdBy': 'Daniel',
+            'Name': 'n8n'
+        },
+        Architectures=['arm64']
     )
-
     return response
