@@ -2,25 +2,16 @@ import boto3
 
 def lambda_handler(event, context):
     ec2 = boto3.client('ec2', region_name='us-east-1')
+    instance_id = 'i-04985d282aa35b48c'  # Replace with the instance ID you want to terminate
+    
     try:
-        instance = ec2.run_instances(
-            ImageId='ami-08b5b3a93ed654d19',
-            InstanceType='t2.micro',
-            MinCount=1,
-            MaxCount=1,
-            TagSpecifications=[
-                {
-                    'ResourceType': 'instance',
-                    'Tags': [
-                        {'Key': 'createdBy', 'Value': 'Daniel'},
-                        {'Key': 'Name', 'Value': 'n8n'}
-                    ]
-                }
-            ],
-            MetadataOptions={
-                'HttpTokens': 'required',  # IMDSv2
-            }
-        )
-        return {'InstanceId': instance['Instances'][0]['InstanceId']}
+        response = ec2.terminate_instances(InstanceIds=[instance_id])
+        return {
+            'Status': 'Success',
+            'TerminatedInstances': response['TerminatingInstances']
+        }
     except Exception as e:
-        return {'Error': str(e)}
+        return {
+            'Status': 'Error',
+            'Message': str(e)
+        }
