@@ -1,16 +1,18 @@
 import boto3
 
-def lambda_handler(event, context):
-    s3 = boto3.client('s3')
-    bucket_name = 'n8n-function'
+s3 = boto3.client('s3')
 
-    # Create the bucket with versioning enabled
+def lambda_handler(event, context):
+    # Create S3 bucket
+    bucket_name = "n8n-function"
     s3.create_bucket(Bucket=bucket_name)
 
     # Enable versioning
     s3.put_bucket_versioning(
         Bucket=bucket_name,
-        VersioningConfiguration={'Status': 'Enabled'}
+        VersioningConfiguration={
+            'Status': 'Enabled'
+        }
     )
 
     # Add tags to the bucket
@@ -18,19 +20,13 @@ def lambda_handler(event, context):
         Bucket=bucket_name,
         Tagging={
             'TagSet': [
-                {
-                    'Key': 'createdBy',
-                    'Value': 'Daniel'
-                },
-                {
-                    'Key': 'Name',
-                    'Value': 'n8n'
-                }
+                {'Key': 'createdBy', 'Value': 'Daniel'},
+                {'Key': 'Name', 'Value': 'n8n'}
             ]
         }
     )
 
     return {
         'statusCode': 200,
-        'body': f'Bucket {bucket_name} created successfully with versioning and tags.'
+        'body': 'S3 bucket created successfully with versioning and tags.'
     }
