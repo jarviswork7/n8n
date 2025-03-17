@@ -5,8 +5,8 @@ def lambda_handler(event, context):
     bucket_name = "hello-world"
     
     try:
-        # Create an S3 bucket with specified region
-        s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': 'us-east-1'})
+        # Create an S3 bucket without location constraint in us-east-1
+        s3.create_bucket(Bucket=bucket_name)
         return {"status": "Bucket created successfully", "bucket_name": bucket_name}
     except Exception as e:
         return {"status": "Error", "error": str(e)}
