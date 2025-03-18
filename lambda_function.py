@@ -20,7 +20,6 @@ instances = ec2.create_instances(
         }
     ],
     InstanceInitiatedShutdownBehavior='terminate',
-    Monitoring={'Enabled': False},
     MetadataOptions={
         'HttpTokens': 'required',
         'HttpEndpoint': 'enabled'
@@ -29,7 +28,7 @@ instances = ec2.create_instances(
 
 # Enabling termination protection
 for instance in instances:
-    instance.modify_attribute(DisableApiTermination={'Value': True})
+    instance.modify_attribute(DisableApiTermination={'Value': False})
 
 instance_id = instances[0].id
 print(f'Created EC2 instance with ID: {instance_id}')
