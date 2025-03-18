@@ -30,6 +30,11 @@ def lambda_handler(event, context):
     workbook = openpyxl.load_workbook(path)
     sheet = workbook.active
     
+    # Create a new sheet if test-sheet doesn't exist
+    if 'test-sheet' not in workbook.sheetnames:
+        workbook.create_sheet('test-sheet')
+    sheet = workbook['test-sheet']
+    
     # Add instance ID to Excel
     sheet.append([instance_id])
 
