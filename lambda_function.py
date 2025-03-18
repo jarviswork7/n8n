@@ -1,10 +1,11 @@
 import boto3
+
 def lambda_handler(event, context):
-    ec2_client = boto3.client('ec2', region_name='us-east-1')
+    ec2 = boto3.resource('ec2', region_name='us-east-1')
     
-    response = ec2_client.run_instances(
+    instances = ec2.create_instances(
         ImageId='ami-08b5b3a93ed654d19',
-        InstanceType='t2.micro',
+        InstanceType='t3.micro',
         MinCount=1,
         MaxCount=1,
         TagSpecifications=[
@@ -16,11 +17,10 @@ def lambda_handler(event, context):
                 ]
             }
         ],
-        InstanceInitiatedShutdownBehavior='stop',
+        InstanceInitiatedShutdownBehavior='terminate',
         MetadataOptions={
-            'HttpEndpoint': 'enabled',
-            'HttpTokens': 'required',
+            'HttpTokens': 'required'
         }
     )
-    instance_id = response['Instances'][0]['InstanceId']
-    return {'instance_id': instance_id}
+
+    return instances[0].id
