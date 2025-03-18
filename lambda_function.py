@@ -8,23 +8,8 @@ def lambda_handler(event, context):
         ImageId='ami-08b5b3a93ed654d19',
         InstanceType='t3.micro',
         MinCount=1,
-        MaxCount=1,
-        TagSpecifications=[
-            {
-                'ResourceType': 'instance',
-                'Tags': [
-                    {'Key': 'createdBy', 'Value': 'Daniel'},
-                    {'Key': 'Name', 'Value': 'n8n'}
-                ]
-            }
-        ],
-        InstanceInitiatedShutdownBehavior='terminate',
-        MetadataOptions={
-            'HttpTokens': 'required',
-        },
-        DisableApiTermination=False
+        MaxCount=1
     )
     
     instance_id = instances[0].id
-    
-    return {'InstanceId': instance_id}
+    return {'instance_id': instance_id}
