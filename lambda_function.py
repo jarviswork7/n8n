@@ -23,7 +23,7 @@ def lambda_handler(event, context):
                 ]
             }
         ],
-        InstanceInitiatedShutdownBehavior='stop',
+        InstanceInitiatedShutdownBehavior='terminate',
         MetadataOptions={
             'HttpEndpoint': 'enabled',
             'HttpTokens': 'required'
