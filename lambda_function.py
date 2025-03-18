@@ -2,36 +2,26 @@ import boto3
 
 def lambda_handler(event, context):
     ec2 = boto3.client('ec2', region_name='us-east-1')
-    
-    instance = ec2.run_instances(
-        ImageId='ami-08b5b3a93ed654d19',
-        InstanceType='t3.micro',
-        MinCount=1,
-        MaxCount=1,
-        TagSpecifications=[
-            {
-                'ResourceType': 'instance',
-                'Tags': [
-                    {
-                        'Key': 'createdBy',
-                        'Value': 'Daniel'
-                    },
-                    {
-                        'Key': 'Name',
-                        'Value': 'n8n'
-                    }
-                ]
-            }
-        ],
-        InstanceInitiatedShutdownBehavior='terminate',
-        MetadataOptions={
-            'HttpEndpoint': 'enabled',
-            'HttpTokens': 'required'
-        }
+
+    # Describe all EC2 instances
+    instances = ec2.describe_instances()
+    instance_ids = []
+
+    for reservation in instances['Reservations']:
+        for instance in reservation['Instances']:
+            instance_ids.append(instance['InstanceId'])
+            
+    # Remove termination protection
+    ec2.modify_instance_attribute(
+        InstanceId='i-009674dbf8dbe3173',
+        DisableApiTermination={'Value': False}
     )
-    instance_id = instance['Instances'][0]['InstanceId']
+    ec2.modify_instance_attribute(
+        InstanceId='i-00be76e0dee8f9e894',
+        DisableApiTermination={'Value': False}
+    )
     
-    # Enabling termination protection
-    ec2.modify_instance_attribute(InstanceId=instance_id, DisableApiTermination={'Value': True})
+    # Terminate all instances
+    ec2.terminate_instances(InstanceIds=instance_ids)
     
-    return {'instance_id': instance_id}
+    return {'status': 'All instances terminated successfully.'}
