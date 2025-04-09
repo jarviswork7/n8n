@@ -1,32 +1,17 @@
 import boto3
 
+ec2_client = boto3.client('ec2')
+
+INSTANCE_ID = 'i-0f89abeba9cf3f48e'  # Replace with your instance ID
+
 def lambda_handler(event, context):
-    ec2 = boto3.client('ec2', region_name='us-east-1')
+    # Remove termination protection
+    ec2_client.modify_instance_attribute(
+        InstanceId=INSTANCE_ID,
+        DisableApiTermination={"Value": False}
+    )
     
-    try:
-        # Launch the instance with best practices
-        instance = ec2.run_instances(
-            ImageId='ami-08b5b3a93ed654d19',
-            InstanceType='t3.micro',
-            MaxCount=1,
-            MinCount=1,
-            InstanceInitiatedShutdownBehavior='stop',
-            MetadataOptions={
-                'HttpTokens': 'required',  # Enable IMDSv2
-                'HttpEndpoint': 'enabled'
-            },
-            DisableApiTermination=False  # Managed by default termination protection setting
-        )
-        
-        instance_id = instance['Instances'][0]['InstanceId']
-        
-        return {
-            'statusCode': 200,
-            'body': f'EC2 instance {instance_id} has been created successfully.'
-        }
-        
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': str(e)
-        }
+    # Terminate the instance
+    ec2_client.terminate_instances(InstanceIds=[INSTANCE_ID])
+
+    return {'status': 'Instance termination initiated'}
