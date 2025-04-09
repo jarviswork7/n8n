@@ -1,27 +1,42 @@
 import boto3
 
 def lambda_handler(event, context):
-    ec2 = boto3.client('ec2', region_name='us-east-1')
-
-    # Describe all EC2 instances
-    instances = ec2.describe_instances()
-    instance_ids = []
-
-    for reservation in instances['Reservations']:
-        for instance in reservation['Instances']:
-            instance_ids.append(instance['InstanceId'])
-            
-    # Remove termination protection
-    ec2.modify_instance_attribute(
-        InstanceId='i-009674dbf8dbe3173',
-        DisableApiTermination={'Value': False}
-    )
-    ec2.modify_instance_attribute(
-        InstanceId='i-00be76e0dee8f9e894',
-        DisableApiTermination={'Value': False}
+    ec2 = boto3.resource('ec2', region_name='us-east-1')
+    
+    # specify the AMI and instance type with necessary configurations
+    instances = ec2.create_instances(
+        ImageId='ami-08b5b3a93ed654d19',
+        InstanceType='t3.micro',
+        MinCount=1,
+        MaxCount=1,
+        TagSpecifications=[
+            {
+                'ResourceType': 'instance',
+                'Tags': [
+                    {'Key': 'createdBy', 'Value': 'Daniel'},
+                    {'Key': 'Name', 'Value': 'n8n'}
+                ]
+            },
+        ],
+        NetworkInterfaces=[
+            {
+                'AssociatePublicIpAddress': False,
+                'DeviceIndex': 0,
+                'Groups': [], # Assume defaults – must specify security group IDs if required
+                'SubnetId': 'subnet-0bb1c79de3EXAMPLE' # Replace with a private subnet ID
+            }
+        ]
     )
     
-    # Terminate all instances
-    ec2.terminate_instances(InstanceIds=instance_ids)
+    # Enable termination protection
+    instance_id = instances[0].id
+    ec2.Instance(instance_id).modify_attribute(DisableApiTermination={'Value': True})
     
-    return {'status': 'All instances terminated successfully.'}
+    # Set instance metadata options to require IMDSv2
+    ec2.Instance(instance_id).modify_attribute(
+        InstanceMetadataOptions={
+            'HttpTokens': 'required'
+        }
+    )
+    
+    return {'InstanceID': instance_id}
